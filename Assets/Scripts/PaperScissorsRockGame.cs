@@ -49,9 +49,7 @@ public class PaperScissorsRockGame : MonoBehaviour
 
     private void Start()
     {
-        paperButton.onClick.AddListener(SetPlayerStatePaper);
-        scissorsButton.onClick.AddListener(SetPlayerStateScissors);
-        rockButton.onClick.AddListener(SetPlayerStateRock);
+        AddListener();
 
         OnPlayerTurnComplete += SetBotState;
         OnBotTurnComplete += GameResult;
@@ -61,13 +59,14 @@ public class PaperScissorsRockGame : MonoBehaviour
 
     private void Update()
     {
-        SetWinState();
+        
     }
 
     private void SetPlayerStatePaper()
     {
         if (!_isRoundEnd)
         {
+            RemoveListener();
             _playerChoice = (int) Choice.Paper;
             InstantiatePrefab(_playerChoice,_zPosPlayer);
             audioManager.PlayOneShot("Paper");
@@ -80,6 +79,7 @@ public class PaperScissorsRockGame : MonoBehaviour
     {
         if (!_isRoundEnd)
         {
+            RemoveListener();
             _playerChoice = (int) Choice.Scissors;
             InstantiatePrefab(_playerChoice,_zPosPlayer);
             audioManager.PlayOneShot("Scissors");
@@ -92,6 +92,7 @@ public class PaperScissorsRockGame : MonoBehaviour
     {
         if (!_isRoundEnd)
         {
+            RemoveListener();
             _playerChoice = (int) Choice.Rock;
             InstantiatePrefab(_playerChoice,_zPosPlayer);
             audioManager.PlayOneShot("Rock");
@@ -138,6 +139,7 @@ public class PaperScissorsRockGame : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         _isRoundEnd = false;
+        AddListener();
         int choicesDifference = _playerChoice - _botChoice;
 
         if (choicesDifference == 0)
@@ -150,32 +152,43 @@ public class PaperScissorsRockGame : MonoBehaviour
         {
             _playerResult++;
             audioManager.PlayOneShot("PlayerStar");
-            if(_playerResult==5) audioManager.PlayOneShot("PlayerWin");
             playerStars[_playerResult-1].GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+            if (_playerResult == 5)
+            {
+                RemoveListener();
+                audioManager.PlayOneShot("PlayerWin");
+                winText.text = "Don't Worry\nTry again";
+                StartCoroutine(ReloadScene());
+            }
         }
 
         if (choicesDifference == -1 || choicesDifference == 2)
         {
             _botResult++;
             audioManager.PlayOneShot("BotStar");
-            if(_botResult==5) audioManager.PlayOneShot("BotWin");
             botStars[_botResult-1].GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+            if (_botResult == 5)
+            {
+                RemoveListener();
+                audioManager.PlayOneShot("BotWin");
+                winText.text = "Excellent!";
+                StartCoroutine(ReloadScene());
+            }
         }
     }
 
-    private void SetWinState()
+    private void RemoveListener()
     {
-        if (_botResult == 5)
-        {
-            winText.text = "Don't Worry\nTry again";
-            StartCoroutine(ReloadScene());
-        }
-        
-        if (_playerResult == 5)
-        {
-            winText.text = "Excellent!";
-            StartCoroutine(ReloadScene());
-        }
+        paperButton.onClick.RemoveListener(SetPlayerStatePaper);
+        scissorsButton.onClick.RemoveListener(SetPlayerStateScissors);
+        rockButton.onClick.RemoveListener(SetPlayerStateRock);
+    }
+
+    private void AddListener()
+    {
+        paperButton.onClick.AddListener(SetPlayerStatePaper);
+        scissorsButton.onClick.AddListener(SetPlayerStateScissors);
+        rockButton.onClick.AddListener(SetPlayerStateRock);
     }
 
     private IEnumerator ReloadScene()
