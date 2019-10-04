@@ -157,7 +157,7 @@ public class PaperScissorsRockGame : MonoBehaviour
             {
                 RemoveListener();
                 audioManager.PlayOneShot("PlayerWin");
-                winText.text = "Don't Worry\nTry again";
+                winText.text = "Excellent!";
                 StartCoroutine(ReloadScene());
             }
         }
@@ -171,7 +171,7 @@ public class PaperScissorsRockGame : MonoBehaviour
             {
                 RemoveListener();
                 audioManager.PlayOneShot("BotWin");
-                winText.text = "Excellent!";
+                winText.text = "Don't Worry\nTry again";
                 StartCoroutine(ReloadScene());
             }
         }
